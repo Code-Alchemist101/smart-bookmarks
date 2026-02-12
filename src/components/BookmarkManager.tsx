@@ -46,8 +46,6 @@ export default function BookmarkManager({
                     table: "bookmarks",
                 },
                 (payload) => {
-                    console.log("Realtime event:", payload.eventType, payload);
-
                     if (payload.eventType === "INSERT") {
                         const newBookmark = payload.new as Bookmark;
                         if (newBookmark.user_id !== user.id) return;
@@ -59,17 +57,29 @@ export default function BookmarkManager({
                         const deletedId = (payload.old as { id: string }).id;
                         setBookmarks((prev) => prev.filter((b) => b.id !== deletedId));
                     } else if (payload.eventType === "UPDATE") {
-                        // Refetch to get latest state
                         refetchBookmarks();
                     }
                 }
             )
-            .subscribe((status) => {
-                console.log("Realtime subscription status:", status);
-            });
+            .subscribe();
+
+        // Poll every 3 seconds as a reliable fallback
+        const pollInterval = setInterval(() => {
+            refetchBookmarks();
+        }, 3000);
+
+        // Refetch when tab becomes visible
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                refetchBookmarks();
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
 
         return () => {
             supabase.removeChannel(channel);
+            clearInterval(pollInterval);
+            document.removeEventListener("visibilitychange", handleVisibility);
         };
     }, [supabase, user.id, refetchBookmarks]);
 
