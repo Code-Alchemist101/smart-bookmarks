@@ -2,7 +2,7 @@
 
 A real-time bookmark manager built with **Next.js 15 (App Router)**, **Supabase**, and **Tailwind CSS**. Users sign in with Google OAuth and can save, view, and delete their private bookmarks — synced in real time across tabs.
 
-**Live URL:** _[add your Vercel URL here after deployment]_
+**Live URL:** [https://smart-bookmarks-three.vercel.app](https://smart-bookmarks-three.vercel.app)
 
 ---
 
